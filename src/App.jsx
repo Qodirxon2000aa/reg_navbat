@@ -33,7 +33,6 @@ export default function App() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [reprintTicketId, setReprintTicketId] = useState("");
   const [now, setNow] = useState(() => new Date());
   const [recentCustomers, setRecentCustomers] = useState([]);
   const [recentSearchQuery, setRecentSearchQuery] = useState("");
@@ -329,31 +328,6 @@ export default function App() {
     }
   };
 
-  const reprintTicket = async (ticketId) => {
-    if (!registration?.id || !ticketId) return;
-    setError("");
-    setReprintTicketId(String(ticketId));
-    try {
-      const response = await fetch(`${API}/registration/reprint-ticket`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          registrationId: registration.id,
-          ticketId
-        })
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        setError(data.message || "Qayta chek chiqarishda xatolik");
-        return;
-      }
-      setMessage(data.message || "Qayta chek printerga yuborildi");
-    } catch {
-      setError("Server bilan aloqa yo'q");
-    } finally {
-      setReprintTicketId("");
-    }
-  };
 
   useEffect(() => {
     setError("");
@@ -744,16 +718,6 @@ export default function App() {
                       {row.service || "Xizmat yo'q"}
                       {row.operator ? ` | ${row.operator}` : ""}
                     </p>
-                    <button
-                      type="button"
-                      style={{ width: "auto", padding: "4px 8px", marginTop: 6, fontSize: 11 }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        void reprintTicket(row.id);
-                      }}
-                    >
-                      {reprintTicketId === String(row.id || "") ? "..." : "Qayta chek"}
-                    </button>
                   </div>
                   <span>
                     {new Date(row.createdAt).toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit" })}
@@ -796,16 +760,6 @@ export default function App() {
                     <div>
                       <strong>{row.firstName || "—"} {row.lastName || ""}</strong>
                       <p>{row.service || "Xizmat yo'q"}</p>
-                      <button
-                        type="button"
-                        style={{ width: "auto", padding: "4px 8px", marginTop: 6, fontSize: 11 }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          void reprintTicket(row.id);
-                        }}
-                      >
-                        {reprintTicketId === String(row.id || "") ? "..." : "Qayta chek"}
-                      </button>
                     </div>
                     <span>{String(row.createdAt || "").slice(0, 16).replace("T", " ")}</span>
                   </div>
